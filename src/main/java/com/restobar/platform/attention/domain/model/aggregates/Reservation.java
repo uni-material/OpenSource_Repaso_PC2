@@ -1,5 +1,8 @@
 package com.restobar.platform.attention.domain.model.aggregates;
 
+import com.restobar.platform.attention.domain.model.commands.CreateReservationCommand;
+import com.restobar.platform.attention.domain.model.entities.Client;
+import com.restobar.platform.attention.domain.model.valueobjects.ClientId;
 import com.restobar.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -9,20 +12,17 @@ import org.apache.logging.log4j.util.Strings;
 
 import java.util.Date;
 
-public class Reservation extends AuditableAbstractAggregateRoot<Reservation> {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Getter
+@Entity
+public class Reservation extends AuditableAbstractAggregateRoot<Reservation> {
 
     @NotNull
     @Size(max = 50)
     private String nameRestaurant;
 
-    @Getter
-    @ManyToOne
-    @JoinColumn(name = "client_id")
-    private Long clientId;
+    @Embedded
+    private ClientId clientId;
 
     @NotNull
     private Date dateReservation;
@@ -31,17 +31,21 @@ public class Reservation extends AuditableAbstractAggregateRoot<Reservation> {
     private Long countPerson;
 
 
-    public Reservation(String nameRestaurant, Long clientId, Date dateReservation, Long countPerson) {
-        this.nameRestaurant = nameRestaurant;
-        this.clientId = clientId;
-        this.dateReservation = dateReservation;
-        this.countPerson = countPerson;
-    }
 
-    public Reservation(){
+    public Reservation(CreateReservationCommand command){
         this.nameRestaurant = Strings.EMPTY;
 
     }
 
 
+    public Reservation() {
+
+    }
+
+    public Reservation(String nameRestaurant, ClientId clientId, Date dateReservation, Long countPerson) {
+        this.nameRestaurant = nameRestaurant;
+        this.clientId = clientId;
+        this.dateReservation = dateReservation;
+        this.countPerson = countPerson;
+    }
 }
